@@ -105,7 +105,6 @@ def delcookie(request):
 def user_mail(request):
     if request.user.is_authenticated:
         if request.method=="POST":
-            print('--------------------------------------------------------------------------')
             print(request.user.id)
             pi=request.user.id
             myuser = User.objects.get(pk=pi)
