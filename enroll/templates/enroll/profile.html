@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+ {% if messages %}
+        {%  for message in messages %}
+            {% if message.tags %}{{message.tags}} {% endif %}
+            <span class="success">{{message}}</span>
+            {% endfor %}
+    {% endif %} 
+        <h1>This is profile page of {{name}}
+        </h1>
+        <a href="{% url 'userlogout' %}">Click</a>
+                <a href="{% url 'changepass' %}">Click change</a>
+                <a href="{% url 'reset_password' %}">Forgetpassword</a>
+                        <a href="{% url 'mail' %}">Go to send mail</a>
+
+
+        <form action="" method="POST" >
+        {% csrf_token %}        
+               {{form.as_p}}
+        
+            <input type="submit" value="Save">
+        </form>
+
+
+</body>
+
+
+</html>
