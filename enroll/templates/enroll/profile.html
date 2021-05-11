@@ -23,10 +23,34 @@
 
         <form action="" method="POST" >
         {% csrf_token %}        
-               {{form.as_p}}
+               {{fm.as_p}}
         
             <input type="submit" value="Save">
         </form>
+
+
+    {% comment %} <h1>Display all users</h1>
+
+{% for s in all %}
+    <tr>
+   
+      <th >{{s.id}}</th>
+      <td>{{s.name}}</td>
+      <td>{{s.email}}</td>
+      <td>{{s.password}}</td>
+
+
+   <p><a href="{% url 'send' s.id %}">Send</a></p>
+
+    </tr>
+{% endfor %}
+<h1>friend request section</h1>
+{% for f in fr %}
+    
+        <a href="{% url 'accept' f.id %}">Accept req {{f.from_user}}</a>
+    
+    {% endfor %}
+ {% endcomment %}
 
 
 </body>

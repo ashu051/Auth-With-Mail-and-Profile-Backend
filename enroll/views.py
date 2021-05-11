@@ -6,6 +6,7 @@ from django.contrib.auth.forms import AuthenticationForm ,PasswordChangeForm
 from django.contrib.auth import authenticate,login,logout,update_session_auth_hash
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader, Context
+from .models import Friend_request
 
 # Create your views here.
 def regi(request):
@@ -35,6 +36,7 @@ def user_login(request):
         
         if request.method == "POST":
             fm=AuthenticationForm(request,data=request.POST)
+            print(fm)
             if fm.is_valid():
                 username = fm.cleaned_data['username']
                 password = fm.cleaned_data['password']
@@ -55,16 +57,23 @@ def user_login(request):
 
 
 def user_profile(request):
+    # user = User.objects.get(id=request.user.id)
     if request.user.is_authenticated:
         if request.method=="POST":
-            fm=EditProfileForm(request.POST,instance=request.user)
-
+            # user_profile = User.objects.get(user=request.user)
+            fm=EditProfileForm(instance=request.user,data=request.POST)
             if fm.is_valid():
+
                 fm.save()
+            return render(request,'enroll/profile.html',{'name':request.user,'fm':fm})
+
 
         else:
-            fm=EditProfileForm(request.POST,instance=request.user)
-        return render(request,'enroll/profile.html',{'name':request.user,'form':fm})
+            fm=EditProfileForm(instance=request.user)
+            print(fm)
+            # allusers=User.objects.exclude(id=request.user.id)
+            # fr= Friend_request.objects.filter(to_user=request.user)
+            return render(request,'enroll/profile.html',{'name':request.user,'fm':fm})
     else:
         return HttpResponseRedirect("/show/user_login/")
 def user_logout(request):
@@ -74,6 +83,7 @@ def user_logout(request):
 def changepass(request):
     if  request.user.is_authenticated:
         if request.method=="POST":
+            
                 fm = PasswordChangeForm(user=request.user,data=request.POST)
                 if fm.is_valid():
                     fm.save()
@@ -137,3 +147,30 @@ def user_mail(request):
         return HttpResponseRedirect("/show/user_login/")
 
 
+def send_friend_request(request,requestid):
+    print('---------------------------------------------------------------------------')
+    print(requestid)
+    from_user = User.objects.get(id=request.user.id)
+    print(from_user)
+    print('---------------------------------------------------------------------------')
+    to_user = User.objects.get(id=requestid)
+    print(to_user)
+    friends_request= Friend_request.objects.get_or_create(id=request.user.id,from_user=from_user,to_user=to_user)
+    print('---------------------------------------------------------------------------')
+    print(friends_request)
+    print('---------------------------------------------------------------------------')
+    return HttpResponseRedirect('/show/profile/')
+
+def accept_friend_request(request,requestid):
+    friend_request= Friend_request.objects.get(id=requestid)
+    friend_request.to_user.friends.add(friend_request.from_user)
+    friend_request.from_user.friends.add(friend_request.to_user)
+    user1=request.user
+    user2=friend_request.user.from_user
+    user1.friends.add(user2)
+    user2.friends.add(user1)
+    return HttpResponseRedirect('/show/profile/')
+
+def all_users(request):
+    stu=Friend_request.objects.filter(to_user=request.user)
+    return render(request,"enroll/users.html",{'stu':stu})
